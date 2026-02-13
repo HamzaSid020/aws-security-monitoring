@@ -1,48 +1,65 @@
-# Ì¥í AWS Security Monitoring Platform
+# AWS Security Monitoring Platform
 
-## Ì≥ã Project Overview
-A comprehensive AWS security monitoring solution that detects, alerts, and logs security threats using GuardDuty, CloudTrail, CloudWatch, and SNS. The system simulates real-world attack scenarios to demonstrate threat detection capabilities.
+A comprehensive AWS-native security monitoring solution that detects, alerts on, and logs potential security threats using **Amazon GuardDuty**, **CloudTrail**, **CloudWatch**, and **SNS**. The project includes automated attack simulations to demonstrate real-world threat detection capabilities.
 
-## ÌøóÔ∏è Architecture
+![Architecture Diagram](architecture.png)
+<!-- If you later add a live badge or status, place it here e.g.:
+[![Terraform Version](https://img.shields.io/badge/Terraform-%3E%3D1.0-blue)](https://www.terraform.io)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE) -->
+
+## ‚ú® Features
+
+### Security Monitoring
+- ‚úÖ Multi-region **AWS CloudTrail** for comprehensive API activity logging
+- ‚úÖ **Amazon GuardDuty** intelligent threat detection (malware, reconnaissance, crypto mining, etc.)
+- ‚úÖ Real-time **CloudWatch** metrics, filters & alarms
+- ‚úÖ Email / SMS notifications via **Amazon SNS**
+- ‚úÖ Encrypted **S3** bucket for long-term secure log archiving
+- ‚úÖ 90-day log retention (optimized for AWS Free Tier)
+
+### Attack Simulations (via Ansible)
+Demonstrates detection of common threat patterns:
+- Port scanning & reconnaissance
+- Unauthorized / brute-force access attempts
+- Cryptocurrency mining activity
+- Backdoor / C2 (command & control) communication patterns
+- Privilege escalation attempts
+- Root / privileged account usage monitoring
+
+## üèóÔ∏è Architecture
+
 ![Architecture Diagram](architecture.png)
 
-### Components
-- **AWS GuardDuty** - Intelligent threat detection service
-- **AWS CloudTrail** - API activity logging
-- **AWS CloudWatch** - Metrics and alarming
-- **AWS SNS** - Email notifications
-- **S3** - Secure log archive
-- **IAM** - Role-based access control
+### Core AWS Components
+- **Amazon GuardDuty** ‚Üí ML-based threat intelligence & anomaly detection
+- **AWS CloudTrail** ‚Üí Audit & API logging (management + data events)
+- **Amazon CloudWatch** ‚Üí Metric filters, alarms & dashboards
+- **Amazon SNS** ‚Üí Notification delivery (email, SMS, Lambda, etc.)
+- **Amazon S3** ‚Üí Encrypted storage for logs & findings exports
+- **AWS IAM** ‚Üí Least-privilege roles & policies
 
-## Ìª†Ô∏è Technologies Used
-- **Terraform** - Infrastructure as Code
-- **Ansible** - Attack simulation automation
-- **AWS Free Tier** - Cost-effective deployment
-- **Git** - Version control
+## üõ†Ô∏è Technologies
 
-## Ì≥ä Features
-### Security Monitoring
-- ‚úÖ Multi-region CloudTrail for API logging
-- ‚úÖ GuardDuty for threat detection
-- ‚úÖ Real-time CloudWatch alarms
-- ‚úÖ Email alerts via SNS
-- ‚úÖ Encrypted S3 log archive
-- ‚úÖ 90-day log retention (Free Tier optimized)
+- **Terraform** ‚â• 1.0 ‚Äî Infrastructure as Code
+- **Ansible** ‚â• 2.9 ‚Äî Attack simulation orchestration
+- **AWS Free Tier** eligible services (cost-conscious design)
+- **Git** ‚Äî Version control & collaboration
 
-### Attack Simulations
-- Ì¥¥ Port scanning detection
-- Ì¥¥ Unauthorized access attempts
-- Ì¥¥ Crypto mining activity simulation
-- Ì¥¥ Backdoor communication patterns
-- Ì¥¥ Privilege escalation attempts
-- Ì¥¥ Root account usage monitoring
-
-## Ì∫Ä Quick Start
+## üöÄ Quick Start
 
 ### Prerequisites
+
+Install and configure these tools:
+
 ```bash
-# Required tools
-- AWS CLI configured
-- Terraform >= 1.0
-- Ansible >= 2.9
-- jq
+# AWS CLI (configured with credentials)
+aws --version
+
+# Terraform >= 1.0
+terraform --version
+
+# Ansible >= 2.9
+ansible --version
+
+# jq (for JSON parsing in scripts)
+jq --version
