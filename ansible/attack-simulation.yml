@@ -1,0 +1,110 @@
+---
+- name: Simulate Security Attacks for GuardDuty Detection
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  vars_files:
+    - vars/aws_credentials.yml
+  
+  tasks:
+    - name: Simulate Reconnaissance - Port Scanning
+      amazon.aws.aws_s3_bucket_info:
+        region: "{{ aws_region }}"
+      register: s3_info
+      ignore_errors: yes
+      tags: recon
+
+    - name: Simulate Unauthorized Access Attempt
+      amazon.aws.aws_iam_access_key_info:
+        region: "{{ aws_region }}"
+      register: iam_info
+      ignore_errors: yes
+      tags: unauthorized
+
+    - name: Simulate Data Exfiltration - Large S3 Download
+      community.aws.s3_object:
+        bucket: "{{ item }}"
+        mode: get
+        object: "/dummy/sensitive-data.txt"
+        dest: "/tmp/sensitive-data.txt"
+        overwrite: different
+      loop: "{{ s3_info.buckets | map(attribute='name') | list | default([]) }}"
+      when: s3_info.buckets is defined
+      ignore_errors: yes
+      tags: exfiltration
+
+    - name: Generate CloudTrail Events - Console Login Failure
+      uri:
+        url: "https://signin.aws.amazon.com/signin"
+        method: GET
+        validate_certs: yes
+        status_code: 200,403
+      ignore_errors: yes
+      tags: iam_anomaly
+
+    - name: Create GuardDuty Finding - CryptoCurrency Attack Simulation
+      shell: |
+        aws guardduty create-sample-findings \
+          --detector-id "{{ guardduty_detector_id }}" \
+          --finding-ids "CryptoCurrency:EC2/BitcoinTool.B!DNS" \
+          --region "{{ aws_region }}"
+      environment:
+        AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
+        AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
+        AWS_DEFAULT_REGION: "{{ aws_region }}"
+      when: guardduty_detector_id is defined
+      ignore_errors: yes
+      tags: crypto
+
+    - name: Create Sample GuardDuty Finding - Backdoor
+      shell: |
+        aws guardduty create-sample-findings \
+          --detector-id "{{ guardduty_detector_id }}" \
+          --finding-ids "Backdoor:EC2/C&CActivity.B!DNS" \
+          --region "{{ aws_region }}"
+      environment:
+        AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
+        AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
+        AWS_DEFAULT_REGION: "{{ aws_region }}"
+      when: guardduty_detector_id is defined
+      ignore_errors: yes
+      tags: backdoor
+
+    - name: Simulate Privilege Escalation Attempt
+      amazon.aws.aws_iam_policy:
+        policy_name: AdminAccess-Simulated
+        policy_document: "{{ lookup('file', 'policies/admin_policy.json') }}"
+      ignore_errors: yes
+      tags: privilege_escalation
+
+    - name: Generate Unauthorized API Calls
+      shell: |
+        aws ec2 describe-instances --region "{{ aws_region }}" --max-items 1000
+        aws s3 ls s3://non-existent-bucket-{{ 999999 | random }}
+        aws iam list-users
+      environment:
+        AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
+        AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
+        AWS_DEFAULT_REGION: "{{ aws_region }}"
+      ignore_errors: yes
+      tags: api_abuse
+
+    - name: Check GuardDuty Findings
+      shell: |
+        aws guardduty list-findings \
+          --detector-id "{{ guardduty_detector_id }}" \
+          --region "{{ aws_region }}" \
+          --query 'FindingIds[0:5]' \
+          --output text
+      register: guardduty_findings
+      environment:
+        AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
+        AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
+        AWS_DEFAULT_REGION: "{{ aws_region }}"
+      when: guardduty_detector_id is defined
+      tags: check
+
+    - name: Display Findings
+      debug:
+        msg: "GuardDuty Findings: {{ guardduty_findings.stdout_lines }}"
+      when: guardduty_findings.stdout_lines | length > 0
