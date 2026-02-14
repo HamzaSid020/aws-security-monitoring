@@ -8,7 +8,7 @@ terraform {
   }
   
   backend "s3" {
-    bucket = "terraform-state-security-monitoring"
+    bucket = "terraform-security-monitoring"
     key    = "security-monitoring/terraform.tfstate"
     region = "us-east-1"
   }

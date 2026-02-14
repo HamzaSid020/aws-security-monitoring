@@ -21,10 +21,10 @@ resource "aws_guardduty_detector" "main" {
   }
 }
 
-# Sample finding generator for testing
-resource "aws_guardduty_detector" "main" {
-  # This is already defined above
-}
+# # Sample finding generator for testing
+# resource "aws_guardduty_detector" "main" {
+#   # This is already defined above
+# }
 
 # IAM role for GuardDuty to publish findings
 resource "aws_iam_role" "guardduty_publishing" {

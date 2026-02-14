@@ -38,6 +38,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "cloudtrail_logs" {
     id     = "expire-old-logs"
     status = "Enabled"
 
+    filter {}
     expiration {
       days = 90 # Free tier - delete logs after 90 days
     }
